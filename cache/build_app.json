@@ -1,0 +1,10 @@
+{
+  "Data" : "/Users/stijn/Documents/GitHub/nap/apps/resonancearchive/data/data.json",
+  "PathMapping" : "app_install_data/resonancearchive/path_mapping.json",
+  "RequiredModules" : [ "napexample", "napapp", "napparametergui" ],
+  "ServiceConfig" : "",
+  "Title" : "ResonaneArchive",
+  "Type" : "nap::ProjectInfo",
+  "Version" : "1.0.0",
+  "mID" : "ProjectInfo"
+}

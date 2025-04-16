@@ -1,0 +1,14 @@
+{
+    "Type": "nap::ProjectInfo",
+    "mID": "ProjectInfo",
+    "Title": "ResonaneArchive",
+    "Version": "1.0.0",
+    "RequiredModules": [
+        "napexample",
+        "napapp",
+        "napparametergui"
+    ],
+    "Data": "data/data.json",
+    "ServiceConfig": "",
+    "PathMapping": "cache/path_mapping.json"
+}
