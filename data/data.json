@@ -1,6 +1,35 @@
 {
     "Objects": [
         {
+            "Type": "nap::Entity",
+            "mID": "RecorderEntity",
+            "Components": [
+                {
+                    "Type": "nap::echo::RecorderComponent",
+                    "mID": "RecorderComponent",
+                    "Archive": "Archive",
+                    "OSCInputComponent": "./OSCInputComponent",
+                    "MaxRecordingSize": 10.0,
+                    "InputChannel": 0
+                },
+                {
+                    "Type": "nap::OSCInputComponent",
+                    "mID": "OSCInputComponent",
+                    "Addresses": [
+                        "/button"
+                    ]
+                }
+            ],
+            "Children": []
+        },
+        {
+            "Type": "nap::OSCReceiver",
+            "mID": "OSCReceiver",
+            "Port": 7000,
+            "EnableDebugOutput": true,
+            "AllowPortReuse": false
+        },
+        {
             "Type": "nap::RenderWindow",
             "mID": "Window",
             "Borderless": false,
@@ -12,19 +41,32 @@
             "Height": 720,
             "Mode": "Immediate",
             "ClearColor": {
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0,
-                "w": 1.0
+                "Values": [
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
+                ]
             },
             "Samples": "Four",
-            "AdditionalSwapImages": 1
+            "AdditionalSwapImages": 1,
+            "RestoreSize": true,
+            "RestorePosition": true
         },
         {
             "Type": "nap::Scene",
             "mID": "Scene",
             "Entities": [
+                {
+                    "Entity": "RecorderEntity",
+                    "InstanceProperties": []
+                }
             ]
+        },
+        {
+            "Type": "nap::echo::Archive",
+            "mID": "Archive",
+            "Directory": "archive"
         }
     ]
 }

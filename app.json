@@ -1,10 +1,10 @@
 {
     "Type": "nap::ProjectInfo",
     "mID": "ProjectInfo",
-    "Title": "ResonaneArchive",
+    "Title": "EchoArchive",
     "Version": "1.0.0",
     "RequiredModules": [
-        "napexample",
+        "napechoarchive",
         "napapp",
         "napparametergui"
     ],

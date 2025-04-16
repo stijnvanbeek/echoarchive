@@ -5,7 +5,10 @@
         "naprender",
         "napaudio",
         "napscene",
-        "napparameter"
+        "napparameter",
+        "napaudioadvanced",
+        "naposc",
+        "napportaudio"
     ],
     "WindowsDllSearchPaths": []
 }
