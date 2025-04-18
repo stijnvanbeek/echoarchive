@@ -57,11 +57,8 @@ namespace nap
 			});
 
 			// Fill the times and durations
-			for (auto i = 0; i < 20; ++i)
-			{
-				mTimes.emplace_back(i * 0.5f);
-				mDurations.emplace_back(1.f);
-			}
+			mTimes = { 0, 1, 2, 3, 4 };
+			mDurations = { 4, 4, 4, 4, 4 };
 		}
 
 
@@ -82,6 +79,7 @@ namespace nap
 			mElapsedTime += deltaTime;
 			if (mPosition < mTimes.size() && mElapsedTime > mTimes[mPosition])
 			{
+				Logger::info("Play");
 				playSound();
 				mPosition++;
 			}
@@ -101,7 +99,7 @@ namespace nap
 			playerNode->setBuffer(mBuffer.get());
 			auto &buffer = mBuffer->channels[0];
 			int bufferPos = math::random<float>(0.f, buffer.size() - 1);
-			playerNode->play(0, bufferPos, math::random<int>(0, 1) == 1 ? 1.f : -1.f);
+			playerNode->play(0, bufferPos, 1.f);
 			mPlayer.mPolyphonic->playOnChannels(voice, { math::random<unsigned int>(0, 1) }, mDurations[mPosition] * 1000.f);
 		}
 

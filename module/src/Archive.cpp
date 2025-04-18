@@ -6,6 +6,8 @@
 
 #include <nap/logger.h>
 
+#include <algorithm>
+
 RTTI_BEGIN_CLASS(nap::echo::Archive)
 		RTTI_PROPERTY("Directory", &nap::echo::Archive::mDirectory, nap::rtti::EPropertyMetaData::Required)
 RTTI_END_CLASS
@@ -38,6 +40,7 @@ namespace nap
 		bool Archive::init(utility::ErrorState &errorState)
 		{
 			utility::listDir(mDirectory.c_str(), mFileNames, false);
+			std::shuffle(mFileNames.begin(), mFileNames.end(), mRandomGenerator);
 			return true;
 		}
 
@@ -53,16 +56,25 @@ namespace nap
 				assert(audioFile.isValid());
 				audioFile.write(buffer.data(), length);
 			}
-			mFileNames.emplace_back(fileName);
-			mPlaybackQueue.enqueue(fileName);
+
+			// Insert in random position
+			int i = math::random<int>(0, mFileNames.size());
+			auto it = mFileNames.begin() + i;
+			mFileNames.insert(it, fileName);
+
+			mJustRecordedQueue.enqueue(fileName);
 		}
 
 
 		void Archive::load(audio::SampleBuffer &buffer)
 		{
 			std::string fileName;
-			if (!mPlaybackQueue.try_dequeue(fileName))
-				fileName = mFileNames[math::random<int>(0, mFileNames.size() - 1)];
+			if (!mJustRecordedQueue.try_dequeue(fileName))
+			{
+				fileName = mFileNames[mPosition++];
+				if (mPosition >= mFileNames.size())
+					mPosition = 0;
+			}
 			auto path = mDirectory + "/" + fileName;
 			audio::AudioFileDescriptor audioFile(path, audio::AudioFileDescriptor::Mode::READ);
 

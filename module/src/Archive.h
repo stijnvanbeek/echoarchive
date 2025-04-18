@@ -4,6 +4,7 @@
 #include <audio/utility/audiotypes.h>
 #include <nap/resource.h>
 #include <utility/threading.h>
+#include <random>
 
 namespace nap
 {
@@ -28,7 +29,10 @@ namespace nap
 
 		private:
 			std::vector<std::string> mFileNames; // Absolute filenames of all the archive files
-			moodycamel::ConcurrentQueue<std::string> mPlaybackQueue;
+			moodycamel::ConcurrentQueue<std::string> mJustRecordedQueue;
+			int mPosition = 0; // Current position in the mFileNames list.
+
+			std::mt19937 mRandomGenerator;
 		};
 
 	}
