@@ -58,9 +58,12 @@ namespace nap
 			}
 
 			// Insert in random position
-			int i = math::random<int>(0, mFileNames.size());
-			auto it = mFileNames.begin() + i;
-			mFileNames.insert(it, fileName);
+			{
+				std::lock_guard<std::mutex> lock(mFileNamesMutex);
+				int i = math::random<int>(0, mFileNames.size());
+				auto it = mFileNames.begin() + i;
+				mFileNames.insert(it, fileName);
+			}
 
 			mJustRecordedQueue.enqueue(fileName);
 		}
@@ -71,6 +74,9 @@ namespace nap
 			std::string fileName;
 			if (!mJustRecordedQueue.try_dequeue(fileName))
 			{
+				std::lock_guard<std::mutex> lock(mFileNamesMutex);
+				if (mFileNames.empty())
+					return;
 				fileName = mFileNames[mPosition++];
 				if (mPosition >= mFileNames.size())
 					mPosition = 0;

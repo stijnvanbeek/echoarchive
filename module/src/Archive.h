@@ -29,6 +29,8 @@ namespace nap
 
 		private:
 			std::vector<std::string> mFileNames; // Absolute filenames of all the archive files
+			std::mutex mFileNamesMutex;
+
 			moodycamel::ConcurrentQueue<std::string> mJustRecordedQueue;
 			int mPosition = 0; // Current position in the mFileNames list.
 
