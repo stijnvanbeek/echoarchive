@@ -22,7 +22,7 @@ namespace nap {
 			void start(audio::SafePtr<audio::SampleBuffer> buffer);
 			void stop();
 			bool isRecording() const { return mIsRecording; }
-			int getPosition() const { return mPosition; }
+			int getPosition() const { return mPosition.load(); }
 
 			audio::InputPin input = { this };
 
@@ -30,7 +30,7 @@ namespace nap {
 			void process() override;
 
 			audio::SafePtr<audio::SampleBuffer> mBuffer = nullptr;
-			int mPosition = 0;
+			std::atomic<int> mPosition = 0;
 			bool mIsRecording = false;
 		};
 
@@ -62,15 +62,21 @@ namespace nap {
 			// Inherited from Component
 			bool init(utility::ErrorState &errorState) override;
 
+			void start();
+			void stop();
+
 		private:
-			Slot<const OSCEvent&> mMessageReceivedSlot = { this, &RecorderComponentInstance::messageReceived };
-			void messageReceived(const OSCEvent& event);
+			Slot<const OSCEvent&> mOSCMessageReceivedSlot = {this, &RecorderComponentInstance::oscMessageReceived };
+			void oscMessageReceived(const OSCEvent& event);
+
+			void normalizeRecording();
 
 			audio::SafeOwner<audio::SampleBuffer> mBuffer; // Buffer to record into.
 			audio::SafeOwner<audio::InputNode> mInputNode = nullptr;
 			audio::SafeOwner<RecorderNode> mRecorderNode = nullptr;
 			audio::NodeManager* mNodeManager = nullptr;
 			ComponentInstancePtr<OSCInputComponent> mOSCInputComponent = { this, &RecorderComponent::mOSCInputComponent };
+			RecorderComponent* mResource = nullptr;
 		};
 
 	}

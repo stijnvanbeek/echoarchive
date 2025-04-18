@@ -2,6 +2,43 @@
     "Objects": [
         {
             "Type": "nap::Entity",
+            "mID": "PlayerEntity",
+            "Components": [
+                {
+                    "Type": "nap::audio::AudioComponent",
+                    "mID": "AudioComponent",
+                    "Object": {
+                        "Type": "nap::audio::Polyphonic",
+                        "mID": "Polyphonic",
+                        "Voice": "Voice",
+                        "VoiceCount": 100,
+                        "VoiceStealing": true,
+                        "ChannelCount": 2,
+                        "Input": ""
+                    },
+                    "Links": []
+                },
+                {
+                    "Type": "nap::audio::OutputComponent",
+                    "mID": "OutputComponent",
+                    "Input": "./AudioComponent",
+                    "Routing": [
+                        0,
+                        1
+                    ]
+                },
+                {
+                    "Type": "nap::echo::PlayerComponent",
+                    "mID": "PlayerComponent",
+                    "AudioComponent": "./AudioComponent",
+                    "BufferPlayer": "BufferPlayer",
+                    "Archive": "Archive"
+                }
+            ],
+            "Children": []
+        },
+        {
+            "Type": "nap::Entity",
             "mID": "RecorderEntity",
             "Components": [
                 {
@@ -54,11 +91,83 @@
             "RestorePosition": true
         },
         {
+            "Type": "nap::ResourceGroup",
+            "mID": "Player",
+            "Members": [
+                {
+                    "Type": "nap::audio::EqualPowerTable",
+                    "mID": "EqualPowerTable",
+                    "Size": 256
+                },
+                {
+                    "Type": "nap::audio::Voice",
+                    "mID": "Voice",
+                    "Objects": [
+                        {
+                            "Type": "nap::audio::BufferPlayer",
+                            "mID": "BufferPlayer",
+                            "Input": "",
+                            "ChannelCount": 1,
+                            "AutoPlay": false,
+                            "Buffer": ""
+                        },
+                        {
+                            "Type": "nap::audio::Envelope",
+                            "mID": "Envelope",
+                            "Envelope": [
+                                {
+                                    "Duration": 100.0,
+                                    "Destination": 1.0,
+                                    "DurationRelative": false,
+                                    "RampMode": "Linear",
+                                    "Translate": false
+                                },
+                                {
+                                    "Duration": 100.0,
+                                    "Destination": 1.0,
+                                    "DurationRelative": true,
+                                    "RampMode": "Linear",
+                                    "Translate": false
+                                },
+                                {
+                                    "Duration": 100.0,
+                                    "Destination": 0.0,
+                                    "DurationRelative": false,
+                                    "RampMode": "Linear",
+                                    "Translate": false
+                                }
+                            ],
+                            "AutoTrigger": false,
+                            "EqualPowerTable": "EqualPowerTable"
+                        },
+                        {
+                            "Type": "nap::audio::Multiply",
+                            "mID": "Multiply",
+                            "Input": "",
+                            "ChannelCount": 1,
+                            "Inputs": [
+                                "BufferPlayer",
+                                "Envelope"
+                            ]
+                        }
+                    ],
+                    "Output": "Multiply",
+                    "Input": "",
+                    "Envelope": "Envelope"
+                }
+            ],
+            "Children": []
+        },
+        {
             "Type": "nap::Scene",
             "mID": "Scene",
             "Entities": [
                 {
                     "Entity": "RecorderEntity",
+                    "InstanceProperties": []
+                },
+                {
+                    "Entity": "PlayerEntity",
                     "InstanceProperties": []
                 }
             ]

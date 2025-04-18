@@ -62,48 +62,61 @@ namespace nap
 
 		bool RecorderComponentInstance::init(utility::ErrorState &errorState)
 		{
-			auto resource = getComponent<RecorderComponent>();
+			mResource = getComponent<RecorderComponent>();
 			mNodeManager = &getEntityInstance()->getCore()->getService<audio::AudioService>()->getNodeManager();
 
 			mInputNode = mNodeManager->makeSafe<audio::InputNode>(*mNodeManager);
-			mInputNode->setInputChannel(resource->mInputChannel);
+			mInputNode->setInputChannel(mResource->mInputChannel);
 			mRecorderNode = mNodeManager->makeSafe<RecorderNode>(*mNodeManager);
 			mRecorderNode->input.connect(mInputNode->audioOutput);
 
 			mBuffer = mNodeManager->makeSafe<audio::SampleBuffer>();
-			mBuffer->resize(resource->mMaxRecordingSize * mNodeManager->getSampleRate());
+			mBuffer->resize(mResource->mMaxRecordingSize * mNodeManager->getSampleRate());
 
 			mNodeManager->registerRootProcess(*mRecorderNode);
-			mOSCInputComponent->messageReceived.connect(mMessageReceivedSlot);
+			mOSCInputComponent->messageReceived.connect(mOSCMessageReceivedSlot);
 
 			return true;
 		}
 
 
-		void RecorderComponentInstance::messageReceived(const nap::OSCEvent &event) {
+		void RecorderComponentInstance::start()
+		{
+			if (!mRecorderNode->isRecording())
+			{
+				mRecorderNode->start(mBuffer.get());
+				Logger::debug("Recording starting");
+			}
+		}
+
+
+		void RecorderComponentInstance::stop()
+		{
+			if (mRecorderNode->isRecording())
+			{
+				mRecorderNode->stop();
+				Logger::debug("Recording finished");
+				mResource->mArchive->save(*mBuffer, mRecorderNode->getPosition(), mNodeManager->getSampleRate());
+			}
+		}
+
+
+		void RecorderComponentInstance::oscMessageReceived(const nap::OSCEvent &event)
+		{
 			auto argument = event.getArgument(0);
 			if (!argument->isInt()) {
-				Logger::warn("RecorderComponentInstance: received non integer message argument");
+				Logger::warn("RecorderComponentInstance: received non integer OSC message argument");
 				return;
 			}
 			int value = argument->asInt();
 			if (value == 1)
-			{
-				if (!mRecorderNode->isRecording())
-				{
-					mRecorderNode->start(mBuffer.get());
-					Logger::debug("Recording starting");
-				}
-			}
+				start();
 			else if (value == 0)
-			{
-				if (mRecorderNode->isRecording())
-				{
-					mRecorderNode->stop();
-					Logger::debug("Recording finished");
-				}
-			}
+				stop();
+			else
+				Logger::warn("RecorderComponentInstance: invalid integer OSC message: %i", value);
 		}
+
 
 	}
 
