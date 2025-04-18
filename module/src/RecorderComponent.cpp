@@ -80,6 +80,12 @@ namespace nap
 		}
 
 
+		void RecorderComponentInstance::onDestroy()
+		{
+			mNodeManager->unregisterRootProcess(*mRecorderNode);
+		}
+
+
 		void RecorderComponentInstance::start()
 		{
 			if (!mRecorderNode->isRecording())

@@ -1,8 +1,13 @@
 #include <PlayerComponent.h>
 
+#include <audio/core/graphobject.h>
+#include <audio/utility/audiofunctions.h>
+
 RTTI_BEGIN_CLASS(nap::echo::PlayerComponent)
 		RTTI_PROPERTY("AudioComponent", &nap::echo::PlayerComponent::mAudioComponent, nap::rtti::EPropertyMetaData::Required)
+		RTTI_PROPERTY("Polyphonic", &nap::echo::PlayerComponent::mPolyphonic, nap::rtti::EPropertyMetaData::Required)
 		RTTI_PROPERTY("BufferPlayer", &nap::echo::PlayerComponent::mBufferPlayer, nap::rtti::EPropertyMetaData::Required)
+		RTTI_PROPERTY("Filter", &nap::echo::PlayerComponent::mFilter, nap::rtti::EPropertyMetaData::Required)
 		RTTI_PROPERTY("Archive", &nap::echo::PlayerComponent::mArchive, nap::rtti::EPropertyMetaData::Required)
 RTTI_END_CLASS
 
@@ -18,17 +23,32 @@ namespace nap
 
 		bool PlayerComponentInstance::init(utility::ErrorState &errorState)
 		{
-			auto resource = getComponent<PlayerComponent>();
-			mPolyphonic = mAudioComponent->getObject<audio::PolyphonicInstance>();
+			mResource = getComponent<PlayerComponent>();
+			auto graphObject = mAudioComponent->getObject<audio::GraphObjectInstance>();
+			if (graphObject == nullptr)
+			{
+				errorState.fail("PlayerComponentInstance: graph object not found");
+				return false;
+			}
+
+			mPolyphonic = graphObject->getObject<audio::PolyphonicInstance>(mResource->mPolyphonic->mID);
 			if (mPolyphonic == nullptr)
 			{
 				errorState.fail("PlayerComponentInstance: polyphonic not found");
 				return false;
 			}
-			if (!mPolyphonic->getObjectMap(resource->mBufferPlayer->mID, mBufferPlayers, errorState))
+
+			mFilter = graphObject->getObject<audio::FilterInstance>(mResource->mFilter->mID);
+			if (mFilter == nullptr)
+			{
+				errorState.fail("PlayerComponentInstance: filter not found");
+				return false;
+			}
+
+			if (!mPolyphonic->getObjectMap(mResource->mBufferPlayer->mID, mBufferPlayers, errorState))
 				return false;
 
-			mArchive = resource->mArchive;
+			mArchive = mResource->mArchive;
 			mNodeManager = &getEntityInstance()->getCore()->getService<audio::AudioService>()->getNodeManager();
 
 			return true;
@@ -44,6 +64,16 @@ namespace nap
 				mSoundLayer = nullptr;
 			else
 				mSoundLayer->update(deltaTime);
+
+			mElapsedTime += deltaTime;
+			float leftLFO = 0.5f * sin(mElapsedTime * math::PI * 0.25f) + 0.5f;
+			float rightLFO = 0.5f * sin(mElapsedTime * math::PI *  0.25f * 0.8f) + 0.5f;
+			float leftPitch = math::lerp(42.f, 100.f, leftLFO);
+			float rightPitch = math::lerp(42.f, 100.f, rightLFO);
+			mFilter->getChannel(0)->setFrequency(audio::mtof(leftPitch));
+			mFilter->getChannel(1)->setFrequency(audio::mtof(rightPitch));
+			mFilter->getChannel(0)->setBand(audio::mtof(leftPitch + 6) - audio::mtof(leftPitch - 6));
+			mFilter->getChannel(1)->setBand(audio::mtof(rightPitch + 6) - audio::mtof(rightPitch - 6));
 		}
 
 
@@ -57,8 +87,13 @@ namespace nap
 			});
 
 			// Fill the times and durations
-			mTimes = { 0, 1, 2, 3, 4 };
-			mDurations = { 4, 4, 4, 4, 4 };
+			auto time = 0.f;
+			for (auto i = 0; i < 5; ++i)
+			{
+				mTimes.emplace_back(time);
+				time += math::random(0.5f, 1.5f);
+				mDurations.emplace_back(4.f);
+			}
 		}
 
 

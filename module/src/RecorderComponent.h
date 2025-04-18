@@ -61,6 +61,7 @@ namespace nap {
 
 			// Inherited from Component
 			bool init(utility::ErrorState &errorState) override;
+			void onDestroy() override;
 
 			void start();
 			void stop();

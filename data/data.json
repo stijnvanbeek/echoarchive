@@ -8,13 +8,9 @@
                     "Type": "nap::audio::AudioComponent",
                     "mID": "AudioComponent",
                     "Object": {
-                        "Type": "nap::audio::Polyphonic",
-                        "mID": "Polyphonic",
-                        "Voice": "Voice",
-                        "VoiceCount": 100,
-                        "VoiceStealing": true,
-                        "ChannelCount": 2,
-                        "Input": ""
+                        "Type": "nap::audio::GraphObject",
+                        "mID": "GraphObject",
+                        "Graph": "Graph"
                     },
                     "Links": []
                 },
@@ -31,7 +27,9 @@
                     "Type": "nap::echo::PlayerComponent",
                     "mID": "PlayerComponent",
                     "AudioComponent": "./AudioComponent",
+                    "Polyphonic": "Polyphonic",
                     "BufferPlayer": "BufferPlayer",
+                    "Filter": "Filter",
                     "Archive": "Archive"
                 }
             ],
@@ -154,6 +152,59 @@
                     "Output": "Multiply",
                     "Input": "",
                     "Envelope": "Envelope"
+                },
+                {
+                    "Type": "nap::audio::Graph",
+                    "mID": "Graph",
+                    "Objects": [
+                        {
+                            "Type": "nap::audio::Polyphonic",
+                            "mID": "Polyphonic",
+                            "Voice": "Voice",
+                            "VoiceCount": 20,
+                            "VoiceStealing": true,
+                            "ChannelCount": 2,
+                            "Input": ""
+                        },
+                        {
+                            "Type": "nap::audio::DelayObject",
+                            "mID": "DelayObject",
+                            "Input": "Polyphonic",
+                            "ChannelCount": 2,
+                            "Time": [
+                                500.0,
+                                600.0
+                            ],
+                            "Feedback": [
+                                0.6000000238418579
+                            ],
+                            "DryWet": [
+                                1.0
+                            ],
+                            "Input": ""
+                        },
+                        {
+                            "Type": "nap::audio::Filter",
+                            "mID": "Filter",
+                            "Input": "DelayObject",
+                            "ChannelCount": 2,
+                            "Mode": "BandPass",
+                            "Frequency": [
+                                440.0
+                            ],
+                            "Resonance": [
+                                0.0
+                            ],
+                            "Band": [
+                                200.0
+                            ],
+                            "Gain": [
+                                1.0
+                            ]
+                        }
+                    ],
+                    "Output": "Filter",
+                    "Input": ""
                 }
             ],
             "Children": []

@@ -4,6 +4,7 @@
 
 #include <audio/core/polyphonic.h>
 #include <audio/object/bufferplayer.h>
+#include <audio/object/filter.h>
 #include <audio/component/audiocomponent.h>
 #include <entity.h>
 
@@ -25,7 +26,9 @@ namespace nap
 			DECLARE_COMPONENT(PlayerComponent, PlayerComponentInstance)
 		public:
 			ComponentPtr<audio::AudioComponent> mAudioComponent; ///< Property: 'AudioComponent'
+			ResourcePtr<audio::Polyphonic> mPolyphonic = nullptr; ///< Property: 'Polyphonic'
 			ResourcePtr<audio::BufferPlayer> mBufferPlayer = nullptr; ///< Property: 'BufferPlayer'
+			ResourcePtr<audio::Filter> mFilter = nullptr; ///< Property: 'Filter'
 			ResourcePtr<Archive> mArchive = nullptr; ///< Property: 'Archive'
 
 		private:
@@ -46,11 +49,13 @@ namespace nap
 		private:
 			ComponentInstancePtr<audio::AudioComponent> mAudioComponent = { this, &PlayerComponent::mAudioComponent };
 			audio::PolyphonicInstance* mPolyphonic = nullptr;
+			audio::FilterInstance* mFilter = nullptr;
 			audio::PolyphonicInstance::ObjectMap<audio::BufferPlayerInstance> mBufferPlayers;
 			ResourcePtr<Archive> mArchive = nullptr;
 			audio::NodeManager* mNodeManager = nullptr;
-
 			std::unique_ptr<SoundLayer> mSoundLayer = nullptr;
+			PlayerComponent* mResource = nullptr;
+			double mElapsedTime = 0.f;
 		};
 
 
