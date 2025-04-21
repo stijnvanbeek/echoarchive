@@ -30,7 +30,16 @@
                     "Polyphonic": "Polyphonic",
                     "BufferPlayer": "BufferPlayer",
                     "Filter": "Filter",
-                    "Archive": "Archive"
+                    "Archive": "Archive",
+                    "ModulationSpeed": 0.25,
+                    "FilterBandWidth": 12.0,
+                    "MinLayerSize": 5.0,
+                    "MaxLayerSize": 5.0,
+                    "SoundDuration": 4.0,
+                    "MinFilterPitch": 42.0,
+                    "MaxFilterPitch": 100.0,
+                    "MinSoundTime": 0.5,
+                    "MaxSoundTime": 1.5
                 }
             ],
             "Children": []

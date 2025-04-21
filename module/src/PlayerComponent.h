@@ -30,6 +30,15 @@ namespace nap
 			ResourcePtr<audio::BufferPlayer> mBufferPlayer = nullptr; ///< Property: 'BufferPlayer'
 			ResourcePtr<audio::Filter> mFilter = nullptr; ///< Property: 'Filter'
 			ResourcePtr<Archive> mArchive = nullptr; ///< Property: 'Archive'
+			float mModulationSpeed = 0.25f; ///< Property: 'ModulationSpeed'
+			float mFilterBandWidth = 12.0f; ///< Property: 'FilterBandWidth'
+			float mMinLayerSize = 5.0f; ///< Property: 'MinLayerSize'
+			float mMaxLayerSize = 5.0f; ///< Property: 'MaxLayerSize'
+			float mSoundDuration = 4.0f; ///< Property: 'SoundDuration'
+			float mMinFilterPitch = 42.f;   ///< Property: 'MinimumFilterPitch'
+			float mMaxFilterPitch = 100.f;  ///< Property: 'MaxFilterPitch'
+			float mMinSoundTime = 0.5f;         ///< Property: 'MinSoundTime'
+			float mMaxSoundTime = 1.5f;         ///< Property: 'MaxSoundTime'
 
 		private:
 		};
