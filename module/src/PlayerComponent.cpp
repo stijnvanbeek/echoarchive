@@ -7,6 +7,7 @@ RTTI_BEGIN_CLASS(nap::echo::PlayerComponent)
     RTTI_PROPERTY("AudioComponent", &nap::echo::PlayerComponent::mAudioComponent, nap::rtti::EPropertyMetaData::Required)
     RTTI_PROPERTY("Polyphonic", &nap::echo::PlayerComponent::mPolyphonic, nap::rtti::EPropertyMetaData::Required)
     RTTI_PROPERTY("BufferPlayer", &nap::echo::PlayerComponent::mBufferPlayer, nap::rtti::EPropertyMetaData::Required)
+	RTTI_PROPERTY("Delay", &nap::echo::PlayerComponent::mDelay, nap::rtti::EPropertyMetaData::Required)
     RTTI_PROPERTY("Filter", &nap::echo::PlayerComponent::mFilter, nap::rtti::EPropertyMetaData::Required)
     RTTI_PROPERTY("Archive", &nap::echo::PlayerComponent::mArchive, nap::rtti::EPropertyMetaData::Required)
     RTTI_PROPERTY("ModulationSpeed", &nap::echo::PlayerComponent::mModulationSpeed, nap::rtti::EPropertyMetaData::Default)
@@ -20,6 +21,8 @@ RTTI_BEGIN_CLASS(nap::echo::PlayerComponent)
     RTTI_PROPERTY("MaxSoundTime", &nap::echo::PlayerComponent::mMaxSoundTime, nap::rtti::EPropertyMetaData::Default)
     RTTI_PROPERTY("MinDelayTime", &nap::echo::PlayerComponent::mMinDelayTime, nap::rtti::EPropertyMetaData::Default)
     RTTI_PROPERTY("MaxDelayTime", &nap::echo::PlayerComponent::mMaxDelayTime, nap::rtti::EPropertyMetaData::Default)
+	RTTI_PROPERTY("MinWaitTime", &nap::echo::PlayerComponent::mMinWaitTime, nap::rtti::EPropertyMetaData::Default)
+	RTTI_PROPERTY("MaxWaitTime", &nap::echo::PlayerComponent::mMaxWaitTime, nap::rtti::EPropertyMetaData::Default)
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::echo::PlayerComponentInstance)
@@ -56,10 +59,10 @@ namespace nap
                 return false;
             }
 
-            mDelay = graphObject->getObject<audio::ParallelNodeObjectInstance<audio::DelayNode>>(mResource->mFilter->mID);
-            if (mFilter == nullptr)
+            mDelay = graphObject->getObject<audio::DelayObjectInstance>(mResource->mDelay->mID);
+            if (mDelay == nullptr)
             {
-                errorState.fail("PlayerComponentInstance: filter not found");
+                errorState.fail("PlayerComponentInstance: delay not found");
                 return false;
             }
 
@@ -76,12 +79,28 @@ namespace nap
         void PlayerComponentInstance::update(double deltaTime)
         {
             if (mSoundLayer == nullptr)
-                mSoundLayer = std::make_unique<SoundLayer>(*this);
+			{
+				mElapsedWaitTime += deltaTime;
+				if (mElapsedWaitTime > mWaitTime)
+				{
+					mWaitTime = math::random(mResource->mMinWaitTime, mResource->mMaxWaitTime);
+					Logger::info("WaitTime: %f", mWaitTime);
+					mElapsedWaitTime = 0.f;
 
-            if (mSoundLayer->isFinished())
-                mSoundLayer = nullptr;
-            else
-                mSoundLayer->update(deltaTime);
+					// Init new sound layer
+					mSoundLayer = std::make_unique<SoundLayer>(*this);
+
+					// Modulate delays
+					mDelay->getChannel(0)->setTime(math::random(mResource->mMinDelayTime, mResource->mMaxDelayTime) * 1000, 1);
+					mDelay->getChannel(1)->setTime(math::random(mResource->mMinDelayTime, mResource->mMaxDelayTime) * 1000, 1);
+				}
+			}
+			else {
+				if (mSoundLayer->isFinished())
+					mSoundLayer = nullptr;
+				else
+					mSoundLayer->update(deltaTime);
+			}
 
             // Modulate filters
             mElapsedTime += deltaTime;

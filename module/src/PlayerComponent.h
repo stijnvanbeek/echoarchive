@@ -29,6 +29,7 @@ namespace nap
 			ComponentPtr<audio::AudioComponent> mAudioComponent; ///< Property: 'AudioComponent'
 			ResourcePtr<audio::Polyphonic> mPolyphonic = nullptr; ///< Property: 'Polyphonic'
 			ResourcePtr<audio::BufferPlayer> mBufferPlayer = nullptr; ///< Property: 'BufferPlayer'
+			ResourcePtr<audio::DelayObject> mDelay = nullptr; ///< Property: 'Delay'
 			ResourcePtr<audio::Filter> mFilter = nullptr; ///< Property: 'Filter'
 			ResourcePtr<Archive> mArchive = nullptr; ///< Property: 'Archive'
 			float mModulationSpeed = 0.25f; ///< Property: 'ModulationSpeed'
@@ -42,6 +43,8 @@ namespace nap
 			float mMaxSoundTime = 1.5f;         ///< Property: 'MaxSoundTime'
 			float mMinDelayTime = 0.2f;
 			float mMaxDelayTime  = 2.f;
+			float mMinWaitTime = 0.f;
+			float mMaxWaitTime = 5.f;
 
 		private:
 		};
@@ -62,13 +65,15 @@ namespace nap
 			ComponentInstancePtr<audio::AudioComponent> mAudioComponent = { this, &PlayerComponent::mAudioComponent };
 			audio::PolyphonicInstance* mPolyphonic = nullptr;
 			audio::FilterInstance* mFilter = nullptr;
-			audio::ParallelNodeObjectInstance<audio::DelayNode>* mDelay = nullptr;
+			audio::DelayObjectInstance* mDelay = nullptr;
 			audio::PolyphonicInstance::ObjectMap<audio::BufferPlayerInstance> mBufferPlayers;
 			ResourcePtr<Archive> mArchive = nullptr;
 			audio::NodeManager* mNodeManager = nullptr;
 			std::unique_ptr<SoundLayer> mSoundLayer = nullptr;
 			PlayerComponent* mResource = nullptr;
 			double mElapsedTime = 0.f;
+			double mWaitTime = 0.f;
+			double mElapsedWaitTime = 0.f;
 		};
 
 

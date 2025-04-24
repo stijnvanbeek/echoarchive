@@ -29,6 +29,7 @@
                     "AudioComponent": "./AudioComponent",
                     "Polyphonic": "Polyphonic",
                     "BufferPlayer": "BufferPlayer",
+                    "Delay": "DelayObject",
                     "Filter": "Filter",
                     "Archive": "Archive",
                     "ModulationSpeed": 0.25,
@@ -39,7 +40,11 @@
                     "MinFilterPitch": 30.0,
                     "MaxFilterPitch": 100.0,
                     "MinSoundTime": 0.5,
-                    "MaxSoundTime": 1.5
+                    "MaxSoundTime": 1.5,
+                    "MinDelayTime": 0.20000000298023224,
+                    "MaxDelayTime": 1.0,
+                    "MinWaitTime": 4.0,
+                    "MaxWaitTime": 8.0
                 }
             ],
             "Children": []
@@ -73,7 +78,6 @@
             "EnableDebugOutput": true,
             "AllowPortReuse": false
         },
-
         {
             "Type": "nap::ResourceGroup",
             "mID": "Player",
@@ -100,7 +104,7 @@
                             "mID": "Envelope",
                             "Envelope": [
                                 {
-                                    "Duration": 100.0,
+                                    "Duration": 1000.0,
                                     "Destination": 1.0,
                                     "DurationRelative": false,
                                     "RampMode": "Linear",
@@ -114,7 +118,7 @@
                                     "Translate": false
                                 },
                                 {
-                                    "Duration": 100.0,
+                                    "Duration": 1000.0,
                                     "Destination": 0.0,
                                     "DurationRelative": false,
                                     "RampMode": "Linear",
@@ -158,14 +162,14 @@
                             "Input": "Polyphonic",
                             "ChannelCount": 2,
                             "Time": [
-                                1000.0,
-                                1200.0
+                                200.0,
+                                300.0
                             ],
                             "Feedback": [
-                                0.4000000238418579
+                                0.4000000059604645
                             ],
                             "DryWet": [
-                                1.0
+                                0.5
                             ],
                             "Input": ""
                         },
@@ -187,9 +191,44 @@
                             "Gain": [
                                 1.0
                             ]
+                        },
+                        {
+                            "Type": "nap::audio::verb47::Reverb47",
+                            "mID": "Reverb47",
+                            "Input": "DelayObject",
+                            "ChannelCount": 2,
+                            "CorrelationMultiplier": [
+                                1.0,
+                                1.100000023841858
+                            ],
+                            "DiffusionCrossover": true,
+                            "Size": 0.800000011920929,
+                            "Decay": 0.4000000059604645,
+                            "Damping": 0.550000011920929,
+                            "Diffusion": 0.550000011920929
+                        },
+                        {
+                            "Type": "nap::audio::Gain",
+                            "mID": "Gain",
+                            "Input": "Reverb47",
+                            "ChannelCount": 2,
+                            "Gain": [
+                                0.10119209438562393
+                            ],
+                            "Input": "Reverb47"
+                        },
+                        {
+                            "Type": "nap::audio::Mixer",
+                            "mID": "Mixer",
+                            "Input": "",
+                            "ChannelCount": 2,
+                            "Inputs": [
+                                "Gain",
+                                "DelayObject"
+                            ]
                         }
                     ],
-                    "Output": "Delay",
+                    "Output": "Mixer",
                     "Input": ""
                 }
             ],
