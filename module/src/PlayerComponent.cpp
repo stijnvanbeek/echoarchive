@@ -18,6 +18,8 @@ RTTI_BEGIN_CLASS(nap::echo::PlayerComponent)
     RTTI_PROPERTY("MaxFilterPitch", &nap::echo::PlayerComponent::mMaxFilterPitch, nap::rtti::EPropertyMetaData::Default)
     RTTI_PROPERTY("MinSoundTime", &nap::echo::PlayerComponent::mMinSoundTime, nap::rtti::EPropertyMetaData::Default)
     RTTI_PROPERTY("MaxSoundTime", &nap::echo::PlayerComponent::mMaxSoundTime, nap::rtti::EPropertyMetaData::Default)
+    RTTI_PROPERTY("MinDelayTime", &nap::echo::PlayerComponent::mMinDelayTime, nap::rtti::EPropertyMetaData::Default)
+    RTTI_PROPERTY("MaxDelayTime", &nap::echo::PlayerComponent::mMaxDelayTime, nap::rtti::EPropertyMetaData::Default)
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::echo::PlayerComponentInstance)
@@ -48,6 +50,13 @@ namespace nap
             }
 
             mFilter = graphObject->getObject<audio::FilterInstance>(mResource->mFilter->mID);
+            if (mFilter == nullptr)
+            {
+                errorState.fail("PlayerComponentInstance: filter not found");
+                return false;
+            }
+
+            mDelay = graphObject->getObject<audio::ParallelNodeObjectInstance<audio::DelayNode>>(mResource->mFilter->mID);
             if (mFilter == nullptr)
             {
                 errorState.fail("PlayerComponentInstance: filter not found");

@@ -5,6 +5,7 @@
 #include <audio/core/polyphonic.h>
 #include <audio/object/bufferplayer.h>
 #include <audio/object/filter.h>
+#include <audio/object/delay.h>
 #include <audio/component/audiocomponent.h>
 #include <entity.h>
 
@@ -39,6 +40,8 @@ namespace nap
 			float mMaxFilterPitch = 100.f;  ///< Property: 'MaxFilterPitch'
 			float mMinSoundTime = 0.5f;         ///< Property: 'MinSoundTime'
 			float mMaxSoundTime = 1.5f;         ///< Property: 'MaxSoundTime'
+			float mMinDelayTime = 0.2f;
+			float mMaxDelayTime  = 2.f;
 
 		private:
 		};
@@ -59,6 +62,7 @@ namespace nap
 			ComponentInstancePtr<audio::AudioComponent> mAudioComponent = { this, &PlayerComponent::mAudioComponent };
 			audio::PolyphonicInstance* mPolyphonic = nullptr;
 			audio::FilterInstance* mFilter = nullptr;
+			audio::ParallelNodeObjectInstance<audio::DelayNode>* mDelay = nullptr;
 			audio::PolyphonicInstance::ObjectMap<audio::BufferPlayerInstance> mBufferPlayers;
 			ResourcePtr<Archive> mArchive = nullptr;
 			audio::NodeManager* mNodeManager = nullptr;
