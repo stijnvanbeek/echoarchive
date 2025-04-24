@@ -44,7 +44,10 @@
                     "MinDelayTime": 0.20000000298023224,
                     "MaxDelayTime": 1.0,
                     "MinWaitTime": 4.0,
-                    "MaxWaitTime": 8.0
+                    "MaxWaitTime": 8.0,
+                    "CompressorThreshold": -6.0,
+                    "CompressorRatio": 4.0,
+                    "CompressorGain": 6.0
                 }
             ],
             "Children": []

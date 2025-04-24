@@ -45,6 +45,9 @@ namespace nap
 			float mMaxDelayTime  = 2.f;
 			float mMinWaitTime = 0.f;
 			float mMaxWaitTime = 5.f;
+			float mCompressorThreshold = -6.f;
+			float mCompressorRatio = 4.f;
+			float mCompressorMakeUp = 6.f;
 
 		private:
 		};

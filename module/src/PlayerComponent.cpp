@@ -2,6 +2,7 @@
 
 #include <audio/core/graphobject.h>
 #include <audio/utility/audiofunctions.h>
+#include <audio/node/compressornode.h>
 
 RTTI_BEGIN_CLASS(nap::echo::PlayerComponent)
     RTTI_PROPERTY("AudioComponent", &nap::echo::PlayerComponent::mAudioComponent, nap::rtti::EPropertyMetaData::Required)
@@ -23,6 +24,9 @@ RTTI_BEGIN_CLASS(nap::echo::PlayerComponent)
     RTTI_PROPERTY("MaxDelayTime", &nap::echo::PlayerComponent::mMaxDelayTime, nap::rtti::EPropertyMetaData::Default)
 	RTTI_PROPERTY("MinWaitTime", &nap::echo::PlayerComponent::mMinWaitTime, nap::rtti::EPropertyMetaData::Default)
 	RTTI_PROPERTY("MaxWaitTime", &nap::echo::PlayerComponent::mMaxWaitTime, nap::rtti::EPropertyMetaData::Default)
+	RTTI_PROPERTY("CompressorThreshold", &nap::echo::PlayerComponent::mCompressorThreshold, nap::rtti::EPropertyMetaData::Default)
+	RTTI_PROPERTY("CompressorRatio", &nap::echo::PlayerComponent::mCompressorRatio, nap::rtti::EPropertyMetaData::Default)
+	RTTI_PROPERTY("CompressorGain", &nap::echo::PlayerComponent::mCompressorMakeUp, nap::rtti::EPropertyMetaData::Default)
 RTTI_END_CLASS
 
 RTTI_BEGIN_CLASS_NO_DEFAULT_CONSTRUCTOR(nap::echo::PlayerComponentInstance)
@@ -123,7 +127,15 @@ namespace nap
             mFileLoaded = std::async(std::launch::async, [&](){
                 mBuffer = mPlayer.mNodeManager->makeSafe<audio::MultiSampleBuffer>();
                 mBuffer->resize(1, 0);
-                mPlayer.mArchive->load(mBuffer->channels[0]);
+				auto& buffer = mBuffer->channels[0];
+                mPlayer.mArchive->load(buffer);
+				audio::FaustCompressor compressor(mPlayer.mNodeManager->getSampleRate());
+				compressor.setThreshold(mPlayer.mResource->mCompressorThreshold);
+				compressor.setRatio(mPlayer.mResource->mCompressorRatio);
+				compressor.compute(buffer.size(), buffer.data(), buffer.data());
+				auto amp = audio::dbToA(mPlayer.mResource->mCompressorMakeUp);
+				for (auto& value : buffer)
+					value *= amp;
             });
 
             // Fill the times and durations
