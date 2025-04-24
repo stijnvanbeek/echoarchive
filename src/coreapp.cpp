@@ -19,10 +19,13 @@ namespace nap
 		// Fetch the resource manager
         mResourceManager = getCore().getResourceManager();
 
-		// Get the render window
-		mRenderWindow = mResourceManager->findObject<nap::RenderWindow>("Window");
-		if (!error.check(mRenderWindow != nullptr, "unable to find render window with name: %s", "Window"))
-			return false;
+		if (!mHeadless)
+		{
+			// Get the render window
+			mRenderWindow = mResourceManager->findObject<nap::RenderWindow>("Window");
+			if (!error.check(mRenderWindow != nullptr, "unable to find render window with name: %s", "Window"))
+				return false;
+		}
 
 		// Get the scene that contains our entities and components
 		mScene = mResourceManager->findObject<Scene>("Scene");
@@ -37,6 +40,9 @@ namespace nap
     // Render app
     void CoreApp::render()
     {
+		if (mHeadless)
+			return;
+
 		// Signal the beginning of a new frame, allowing it to be recorded.
 		// The system might wait until all commands that were previously associated with the new frame have been processed on the GPU.
 		// Multiple frames are in flight at the same time, but if the graphics load is heavy the system might wait here to ensure resources are available.
@@ -94,6 +100,9 @@ namespace nap
 	// Update app
     void CoreApp::update(double deltaTime)
     {
+		if (mHeadless)
+			return;
+
 		// Use a default input router to forward input events (recursively) to all input components in the scene
 		// This is explicit because we don't know what entity should handle the events from a specific window.
 		nap::DefaultInputRouter input_router(true);

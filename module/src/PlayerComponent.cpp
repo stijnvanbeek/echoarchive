@@ -126,7 +126,7 @@ namespace nap
             mElapsedTime += deltaTime;
             if (mPosition < mTimes.size() && mElapsedTime > mTimes[mPosition])
             {
-                Logger::info("Play");
+                Logger::info("Play pos %i time %f", mPosition, mElapsedTime);
                 playSound();
                 mPosition++;
             }

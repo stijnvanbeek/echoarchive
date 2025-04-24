@@ -77,5 +77,6 @@ namespace nap
 		IMGuiService*				mGuiService = nullptr;			///< Manages GUI related update / draw calls
 		ObjectPtr<RenderWindow>		mRenderWindow;					///< Pointer to the render window	
 		ObjectPtr<Scene>			mScene = nullptr;				///< Pointer to the main scene
+        bool mHeadless = true; ///< Flag to indicate if the app is running in headless mode
 	};
 }
